@@ -1,0 +1,161 @@
+{
+ "actions": [],
+ "allow_guest_to_view": 1,
+ "allow_rename": 1,
+ "autoname": "format:{event}-{###}",
+ "creation": "2025-10-16 11:50:30.027136",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_gk90",
+  "attendee",
+  "attendee_email",
+  "event",
+  "ticket_type",
+  "quantity",
+  "price",
+  "total_amount",
+  "payment_status",
+  "razorpay_payment_id",
+  "qr_code",
+  "sales_order",
+  "sales_invoice"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_gk90",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Int",
+   "label": "Quantity"
+  },
+  {
+   "fetch_from": "ticket_type.price",
+   "fetch_if_empty": 1,
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount"
+  },
+  {
+   "fieldname": "payment_status",
+   "fieldtype": "Select",
+   "label": "Payment Status",
+   "options": "Pending\nPaid"
+  },
+  {
+   "fieldname": "razorpay_payment_id",
+   "fieldtype": "Data",
+   "label": "Razorpay Payment ID"
+  },
+  {
+   "fieldname": "qr_code",
+   "fieldtype": "Attach Image",
+   "label": "QR Code"
+  },
+  {
+   "fieldname": "attendee",
+   "fieldtype": "Link",
+   "label": "Attendee",
+   "options": "Attendee"
+  },
+  {
+   "fieldname": "event",
+   "fieldtype": "Link",
+   "label": "Event",
+   "options": "New Event"
+  },
+  {
+   "fieldname": "ticket_type",
+   "fieldtype": "Link",
+   "label": "Ticket Type",
+   "options": "Ticket Type"
+  },
+  {
+   "fetch_from": "ticket_type.price",
+   "fetch_if_empty": 1,
+   "fieldname": "price",
+   "fieldtype": "Int",
+   "label": "Price"
+  },
+  {
+   "default": "0",
+   "fetch_from": "attendee.email",
+   "fieldname": "attendee_email",
+   "fieldtype": "Data",
+   "label": "Attendee Email"
+  },
+  {
+   "fieldname": "sales_order",
+   "fieldtype": "Link",
+   "label": "Sales Order",
+   "options": "Sales Order"
+  },
+  {
+   "fieldname": "sales_invoice",
+   "fieldtype": "Link",
+   "label": "Sales Invoice",
+   "options": "Sales Invoice"
+  }
+ ],
+ "grid_page_length": 50,
+ "links": [
+  {
+   "link_doctype": "Ticket Type",
+   "link_fieldname": "price"
+  },
+  {
+   "link_doctype": "Attendee",
+   "link_fieldname": "email"
+  }
+ ],
+ "modified": "2025-10-24 11:06:19.881690",
+ "modified_by": "Administrator",
+ "module": "boss",
+ "name": "Booking",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Organizer",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Attendee",
+   "share": 1
+  }
+ ],
+ "route": "booking",
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

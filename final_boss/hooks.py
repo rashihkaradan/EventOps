@@ -241,4 +241,9 @@ app_license = "mit"
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
+def on_submit(self):
+    from final_boss.boss.api.payment import send_booking_email_with_qr
+    send_booking_email_with_qr(self.name)
+
+
 

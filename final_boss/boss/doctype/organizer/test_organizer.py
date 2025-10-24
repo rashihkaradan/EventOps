@@ -1,0 +1,9 @@
+# Copyright (c) 2025, rashih and Contributors
+# See license.txt
+
+# import frappe
+from frappe.tests.utils import FrappeTestCase
+
+
+class TestOrganizer(FrappeTestCase):
+	pass

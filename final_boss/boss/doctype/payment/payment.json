@@ -1,0 +1,98 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{transaction_id}",
+ "creation": "2025-10-17 10:41:34.838755",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_pn3p",
+  "booking",
+  "transaction_id",
+  "payment_gateway",
+  "status",
+  "amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_pn3p",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "booking",
+   "fieldtype": "Link",
+   "label": "Booking",
+   "options": "Booking"
+  },
+  {
+   "fetch_from": "booking.razorpay_payment_id",
+   "fieldname": "transaction_id",
+   "fieldtype": "Data",
+   "label": "Transaction Id",
+   "read_only": 1
+  },
+  {
+   "fieldname": "payment_gateway",
+   "fieldtype": "Select",
+   "label": "Payment Gateway",
+   "options": "Razorpay sandbox"
+  },
+  {
+   "fetch_from": "booking.payment_status",
+   "fetch_if_empty": 1,
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Paid\nPnding\nFiled\nCancelled"
+  },
+  {
+   "fetch_from": "booking.total_amount",
+   "fetch_if_empty": 1,
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "label": "Amount",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [
+  {
+   "link_doctype": "Booking",
+   "link_fieldname": "total_amount"
+  },
+  {
+   "link_doctype": "Booking",
+   "link_fieldname": "razorpay_payment_id"
+  },
+  {
+   "link_doctype": "Booking",
+   "link_fieldname": "payment_status"
+  }
+ ],
+ "modified": "2025-10-17 16:35:46.610340",
+ "modified_by": "Administrator",
+ "module": "boss",
+ "name": "Payment",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
