@@ -19,7 +19,8 @@
   "razorpay_payment_id",
   "qr_code",
   "sales_order",
-  "sales_invoice"
+  "sales_invoice",
+  "amended_from"
  ],
  "fields": [
   {
@@ -97,9 +98,20 @@
    "fieldtype": "Link",
    "label": "Sales Invoice",
    "options": "Sales Invoice"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Booking",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "grid_page_length": 50,
+ "is_submittable": 1,
  "links": [
   {
    "link_doctype": "Ticket Type",
@@ -110,7 +122,7 @@
    "link_fieldname": "email"
   }
  ],
- "modified": "2025-10-24 11:06:19.881690",
+ "modified": "2025-10-28 11:26:51.381097",
  "modified_by": "Administrator",
  "module": "boss",
  "name": "Booking",
