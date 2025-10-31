@@ -55,7 +55,6 @@
   }
  ],
  "grid_page_length": 50,
- "index_web_pages_for_search": 1,
  "links": [
   {
    "link_doctype": "Booking",
@@ -70,7 +69,7 @@
    "link_fieldname": "payment_status"
   }
  ],
- "modified": "2025-10-17 16:35:46.610340",
+ "modified": "2025-10-29 14:55:20.207644",
  "modified_by": "Administrator",
  "module": "boss",
  "name": "Payment",

@@ -53,10 +53,8 @@
   }
  ],
  "grid_page_length": 50,
- "has_web_view": 1,
- "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-19 15:42:54.208464",
+ "modified": "2025-10-29 14:55:43.074779",
  "modified_by": "Administrator",
  "module": "boss",
  "name": "Venue",
@@ -97,7 +95,6 @@
    "share": 1
   }
  ],
- "route": "Venue Name",
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",

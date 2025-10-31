@@ -246,17 +246,12 @@ def on_submit(self):
     send_booking_email_with_qr(self.name)
 
     
-doc_events = {
-  "Booking": {
-    "on_submit": "final_boss.boss.api.booking.make_sales_order"
-  }
-}
+# doc_events = {
+#   "Booking": {
+#     "on_submit": "final_boss.boss.doctype.booking.make_sales_order"
+#   }
+# }
 
-# hooks.py
-doc_events = {
-    "*": {
-        "before_request": "final_boss.overrides.payment_webform_patch"
-    }
-}
+
 
 

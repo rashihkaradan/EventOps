@@ -47,10 +47,8 @@
   }
  ],
  "grid_page_length": 50,
- "has_web_view": 1,
- "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-17 16:35:03.196951",
+ "modified": "2025-10-29 14:53:32.265681",
  "modified_by": "Administrator",
  "module": "boss",
  "name": "Attendee",
@@ -70,7 +68,6 @@
    "write": 1
   }
  ],
- "route": "Full Name",
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",

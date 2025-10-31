@@ -68,10 +68,8 @@
   }
  ],
  "grid_page_length": 50,
- "has_web_view": 1,
- "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-19 15:39:27.712121",
+ "modified": "2025-10-29 14:53:09.440428",
  "modified_by": "Administrator",
  "module": "boss",
  "name": "New Event",
@@ -112,7 +110,6 @@
    "share": 1
   }
  ],
- "route": "title",
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",

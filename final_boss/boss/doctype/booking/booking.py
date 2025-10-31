@@ -6,6 +6,8 @@ from frappe.model.document import Document
 from frappe.model.mapper import get_mapped_doc
 from erpnext.accounts.doctype.payment_request.payment_request import make_payment_request
 
+
+
 # ---------------------------------------------------------------------
 # BOOKING CLASS
 # ---------------------------------------------------------------------
