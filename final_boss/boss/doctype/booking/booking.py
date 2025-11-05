@@ -71,6 +71,7 @@ def make_sales_order(booking_name):
     frappe.logger("razorpay_webhook").info(f"[Webhook] Sales Order Created: {so.name}")
     return so
 
+    
 @frappe.whitelist()
 def create_invoice_and_payment(sales_order_name):
     so = frappe.get_doc("Sales Order", sales_order_name)
@@ -96,13 +97,28 @@ def create_invoice_and_payment(sales_order_name):
     pe.party = so.customer
     pe.paid_amount = si.grand_total
     pe.received_amount = si.grand_total
+
+    # ✅ Dynamically find a Bank or Cash account (non-group)
+    bank_account = frappe.db.get_value(
+        "Account",
+        {"account_type": ["in", ["Bank", "Cash"]], "is_group": 0},
+        "name"
+    )
+
+    if not bank_account:
+        frappe.throw("No Bank or Cash account found. Please create one under Chart of Accounts.")
+
+    pe.paid_to = bank_account
+    pe.paid_to_account_currency = frappe.db.get_value("Account", bank_account, "account_currency")
+
+    # ✅ Add reference to Sales Invoice
     pe.append("references", {
         "reference_doctype": "Sales Invoice",
         "reference_name": si.name,
         "allocated_amount": si.grand_total
     })
 
-    # ✅ Set target exchange rate safely
+    # ✅ Handle exchange rate
     if pe.paid_from_account_currency != pe.paid_to_account_currency:
         pe.target_exchange_rate = frappe.db.get_value(
             "Currency Exchange",
@@ -129,6 +145,7 @@ def create_invoice_and_payment(sales_order_name):
     frappe.db.commit()
     frappe.logger("razorpay_webhook").info(f"[Webhook] Invoice: {si.name}, Payment Entry: {pe.name}")
     return {"sales_invoice": si.name, "payment_entry": pe.name}
+
 
 # ---------------------------------------------------------------------
 # 3️⃣ CREATE RAZORPAY PAYMENT ORDER
