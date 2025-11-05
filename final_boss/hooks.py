@@ -7,7 +7,13 @@ app_license = "mit"
 
 # Apps
 # ------------------
-
+web_methods = {
+    # Razorpay sends a POST request with the webhook payload
+    "POST": {
+        # The key is the URL path segment, the value is the full function path
+        "razorpay_webhook": "final_boss.boss.api.razorpay_webhook"
+}
+}
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
@@ -241,9 +247,9 @@ app_license = "mit"
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
-def on_submit(self):
-    from final_boss.boss.api.payment import send_booking_email_with_qr
-    send_booking_email_with_qr(self.name)
+# def on_submit(self):
+#     from final_boss.boss.api.payment import send_booking_email_with_qr
+#     send_booking_email_with_qr(self.name)
 
     
 # doc_events = {

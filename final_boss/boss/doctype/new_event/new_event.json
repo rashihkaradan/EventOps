@@ -69,7 +69,7 @@
  ],
  "grid_page_length": 50,
  "links": [],
- "modified": "2025-10-29 14:53:09.440428",
+ "modified": "2025-11-04 11:27:24.954869",
  "modified_by": "Administrator",
  "module": "boss",
  "name": "New Event",
@@ -110,6 +110,7 @@
    "share": 1
   }
  ],
+ "route": "events",
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",

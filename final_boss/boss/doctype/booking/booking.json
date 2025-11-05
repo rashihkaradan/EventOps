@@ -12,8 +12,8 @@
   "attendee_email",
   "event",
   "ticket_type",
-  "quantity",
   "price",
+  "quantity",
   "total_amount",
   "payment_status",
   "razorpay_payment_id",
@@ -35,8 +35,6 @@
    "label": "Quantity"
   },
   {
-   "fetch_from": "ticket_type.price",
-   "fetch_if_empty": 1,
    "fieldname": "total_amount",
    "fieldtype": "Currency",
    "label": "Total Amount"
@@ -70,17 +68,11 @@
    "options": "New Event"
   },
   {
+   "depends_on": "eval:doc.event",
    "fieldname": "ticket_type",
    "fieldtype": "Link",
    "label": "Ticket Type",
-   "options": "Ticket Type"
-  },
-  {
-   "fetch_from": "ticket_type.price",
-   "fetch_if_empty": 1,
-   "fieldname": "price",
-   "fieldtype": "Int",
-   "label": "Price"
+   "options": "Item"
   },
   {
    "fetch_from": "attendee.email",
@@ -120,17 +112,17 @@
    "fieldtype": "Link",
    "label": "Payment Request",
    "options": "Payment Request"
+  },
+  {
+   "fieldname": "price",
+   "fieldtype": "Currency",
+   "label": "Price"
   }
  ],
  "grid_page_length": 50,
  "is_submittable": 1,
- "links": [
-  {
-   "link_doctype": "Ticket Type",
-   "link_fieldname": "price"
-  }
- ],
- "modified": "2025-10-31 14:12:07.168797",
+ "links": [],
+ "modified": "2025-11-04 18:03:13.621655",
  "modified_by": "Administrator",
  "module": "boss",
  "name": "Booking",

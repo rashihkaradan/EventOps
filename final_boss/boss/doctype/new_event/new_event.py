@@ -1,8 +1,11 @@
+import frappe
 from frappe.model.document import Document
 
 class NewEvent(Document):
-    # Your methods here
-    pass
+    website = frappe._dict(
+        condition_field="name"   # change to "route" if you have a route field
+    )
+
 def get_list_context(context=None):
     return {
         "title": "Events",

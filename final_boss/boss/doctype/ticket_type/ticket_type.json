@@ -17,27 +17,30 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "ticket_type",
-   "fieldtype": "Select",
-   "label": "Ticket Type",
-   "options": "VIp\nRegular\nStudent"
-  },
-  {
    "fieldname": "price",
    "fieldtype": "Currency",
+   "in_list_view": 1,
    "label": "Price"
   },
   {
    "fieldname": "quantity",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "Quantity"
+  },
+  {
+   "fieldname": "ticket_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Ticket Type",
+   "options": "Item"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-10-16 17:22:42.936707",
+ "modified": "2025-11-03 17:59:21.612859",
  "modified_by": "Administrator",
  "module": "boss",
  "name": "Ticket Type",

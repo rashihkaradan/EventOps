@@ -1,99 +1,84 @@
 import frappe
-import razorpay
 import qrcode
 import io
 from frappe.model.document import Document
 from frappe.model.mapper import get_mapped_doc
+from frappe.utils.file_manager import save_file
+from frappe.utils import nowdate
 from erpnext.accounts.doctype.payment_request.payment_request import make_payment_request
-
-
 
 # ---------------------------------------------------------------------
 # BOOKING CLASS
 # ---------------------------------------------------------------------
 class Booking(Document):
-
-    # Calculate total before saving
     def validate(self):
+        # in booking.py
+        if self.ticket_type:
+            price = frappe.db.get_value(
+                "Item Price",
+                {"item_code": self.ticket_type, "price_list": "Standard Selling"},
+                "price_list_rate"
+            )
+            self.price = price or 0
+
+        """Calculate total before saving."""
         self.total_amount = (self.price or 0) * (self.quantity or 0)
 
     def before_save(self):
-        """Generate a QR code dynamically when event or attendee changes."""
-        if not self.qr_code or self.has_value_changed('event') or self.has_value_changed('attendee'):
+        """Generate QR code when event or attendee changes."""
+        if not self.qr_code or self.has_value_changed("event") or self.has_value_changed("attendee"):
             self.generate_qr_code()
 
     def generate_qr_code(self):
-        """Generate and attach QR Code to booking record."""
-        qr_data = f"Booking ID: {self.name}"
+        """Generate and attach a QR code to this Booking."""
+        qr_data = f"Booking ID: {self.name}\nAttendee: {self.attendee}\nEvent: {self.event}"
         img = qrcode.make(qr_data)
 
         buf = io.BytesIO()
-        img.save(buf, format='PNG')
-        qr_bytes = buf.getvalue()
+        img.save(buf, format="PNG")
+        buf.seek(0)
 
         file_name = f"qr_code_{self.name}.png"
-        file_doc = frappe.get_doc({
-            "doctype": "File",
-            "file_name": file_name,
-            "content": qr_bytes,
-            "is_private": 0,
-            "attached_to_doctype": self.doctype,
-            "attached_to_name": self.name,
-        })
-        file_doc.save(ignore_permissions=True)
+        file_doc = save_file(file_name, buf.getvalue(), self.doctype, self.name, is_private=False)
         self.qr_code = file_doc.file_url
+
 
 # ---------------------------------------------------------------------
 # 1️⃣ MAP BOOKING → SALES ORDER
 # ---------------------------------------------------------------------
 @frappe.whitelist()
-def make_sales_order(source_name, target_doc=None):
-    """Map Booking DocType to Sales Order."""
-    def set_missing_values(source, target):
-        target.transaction_date = frappe.utils.nowdate()
-        target.customer = source.attendee or source.customer
+def make_sales_order(booking_name):
+    booking = frappe.get_doc("Booking", booking_name)
 
-    mapped = get_mapped_doc(
-        "Booking",
-        source_name,
-        {
-            "Booking": {
-                "doctype": "Sales Order",
-                "field_map": {
-                    "attendee": "customer",
-                    "event": "remarks"
-                },
-            },
-            "Ticket Type": {
-                "doctype": "Sales Order Item",
-                "field_map": {
-                    "ticket_type": "item_code",
-                    "price": "rate",
-                    "quantity": "qty"
-                },
-            }
-        },
-        target_doc,
-        set_missing_values
-    )
+    # Create Sales Order
+    so = frappe.new_doc("Sales Order")
+    so.customer = booking.attendee
+    so.transaction_date = nowdate()
+    so.delivery_date = nowdate()
+    so.append("items", {
+        "item_code": booking.ticket_type,
+        "qty": booking.quantity,
+        "rate": booking.price,
+        "amount": booking.total_amount
+    })
+    so.insert(ignore_permissions=True)
+    so.submit()
 
-    sales_order = mapped
-    sales_order.insert(ignore_permissions=True)
-    frappe.db.set_value("Booking", source_name, "sales_order", sales_order.name)
-    return sales_order.as_dict()
+    # Link back to Booking
+    booking.sales_order = so.name
+    booking.save(ignore_permissions=True)
 
-# ---------------------------------------------------------------------
-# 2️⃣ INVOICE + PAYMENT REQUEST
-# ---------------------------------------------------------------------
+    frappe.logger("razorpay_webhook").info(f"[Webhook] Sales Order Created: {so.name}")
+    return so
+
 @frappe.whitelist()
-def create_invoice_and_payment(so_name, make_payment_request_flag=True):
-    """Create a Sales Invoice and Payment Request for a Sales Order."""
-    so = frappe.get_doc("Sales Order", so_name)
+def create_invoice_and_payment(sales_order_name):
+    so = frappe.get_doc("Sales Order", sales_order_name)
 
-    # Create Invoice
+    # Create Sales Invoice
     si = frappe.new_doc("Sales Invoice")
     si.customer = so.customer
-    si.due_date = frappe.utils.nowdate()
+    si.due_date = nowdate()
     for item in so.items:
         si.append("items", {
             "item_code": item.item_code,
@@ -102,42 +87,63 @@ def create_invoice_and_payment(so_name, make_payment_request_flag=True):
             "sales_order": so.name
         })
     si.insert(ignore_permissions=True)
+    si.submit()
 
-    frappe.db.set_value("Sales Order", so.name, "sales_invoice", si.name)
+    # Create Payment Entry
+    pe = frappe.new_doc("Payment Entry")
+    pe.payment_type = "Receive"
+    pe.party_type = "Customer"
+    pe.party = so.customer
+    pe.paid_amount = si.grand_total
+    pe.received_amount = si.grand_total
+    pe.append("references", {
+        "reference_doctype": "Sales Invoice",
+        "reference_name": si.name,
+        "allocated_amount": si.grand_total
+    })
+
+    # ✅ Set target exchange rate safely
+    if pe.paid_from_account_currency != pe.paid_to_account_currency:
+        pe.target_exchange_rate = frappe.db.get_value(
+            "Currency Exchange",
+            {
+                "from_currency": pe.paid_from_account_currency,
+                "to_currency": pe.paid_to_account_currency
+            },
+            "exchange_rate"
+        ) or 1
+    else:
+        pe.target_exchange_rate = 1
+
+    pe.insert(ignore_permissions=True)
+    pe.submit()
+
+    # ✅ Link to Booking
+    booking_name = frappe.db.get_value("Booking", {"sales_order": so.name}, "name")
+    if booking_name:
+        booking = frappe.get_doc("Booking", booking_name)
+        booking.sales_invoice = si.name
+        booking.payment_status = "Paid"
+        booking.save(ignore_permissions=True)
+
     frappe.db.commit()
-
-    payment_request_name = None
-    if make_payment_request_flag:
-        pr = make_payment_request(
-            dt="Sales Invoice", dn=si.name,
-            recipient_id=None,  # optional if customer email is set in invoice
-            payment_gateway="Razorpay"  # Must match the configured Gateway name
-        )
-        pr.insert(ignore_permissions=True)
-        payment_request_name = pr.name
-
-        # Link back to related booking
-        booking_name = frappe.db.get_value("Sales Order", so.name, "booking")
-        if booking_name:
-            frappe.db.set_value("Booking", booking_name, "payment_request", pr.name)
-
-    return {"sales_invoice": si.name, "payment_request": payment_request_name}
+    frappe.logger("razorpay_webhook").info(f"[Webhook] Invoice: {si.name}, Payment Entry: {pe.name}")
+    return {"sales_invoice": si.name, "payment_entry": pe.name}
 
 # ---------------------------------------------------------------------
 # 3️⃣ CREATE RAZORPAY PAYMENT ORDER
 # ---------------------------------------------------------------------
-# @frappe.whitelist(allow_guest=True)
-# def create_payment_order(amount, reference):
-#     """Create a Razorpay payment order through server-side API."""
-#     settings = frappe.get_single("Razorpay Settings")  # Must exist in Integrations
-#     client = razorpay.Client(auth=(settings.api_key, settings.api_secret))
+@frappe.whitelist(allow_guest=True)
+def create_razorpay_order(amount, reference):
+    """Create a Razorpay order via server-side API."""
+    settings = frappe.get_single("Razorpay Settings")
+    import razorpay
+    client = razorpay.Client(auth=(settings.api_key, settings.api_secret))
 
-#     payment = client.order.create({
-#         "amount": int(amount * 100),  # in paise
-#         "currency": "INR",
-#         "receipt": reference,
-#         "payment_capture": 1
-#     })
-#     return payment
-
-
+    order = client.order.create({
+        "amount": int(amount * 100),
+        "currency": "INR",
+        "receipt": reference,
+        "payment_capture": 1
+    })
+    return order
