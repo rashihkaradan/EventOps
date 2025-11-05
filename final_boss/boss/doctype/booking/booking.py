@@ -71,7 +71,6 @@ def make_sales_order(booking_name):
     frappe.logger("razorpay_webhook").info(f"[Webhook] Sales Order Created: {so.name}")
     return so
 
-    
 @frappe.whitelist()
 def create_invoice_and_payment(sales_order_name):
     so = frappe.get_doc("Sales Order", sales_order_name)
