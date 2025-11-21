@@ -8,8 +8,8 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_gk90",
+  "customer",
   "attendee",
-  "attendee_email",
   "event",
   "ticket_type",
   "price",
@@ -57,7 +57,7 @@
   },
   {
    "fieldname": "attendee",
-   "fieldtype": "Link",
+   "fieldtype": "Table",
    "label": "Attendee",
    "options": "Attendee"
   },
@@ -73,12 +73,6 @@
    "fieldtype": "Link",
    "label": "Ticket Type",
    "options": "Item"
-  },
-  {
-   "fetch_from": "attendee.email",
-   "fieldname": "attendee_email",
-   "fieldtype": "Data",
-   "label": "Attendee Email"
   },
   {
    "fieldname": "sales_order",
@@ -117,12 +111,18 @@
    "fieldname": "price",
    "fieldtype": "Currency",
    "label": "Price"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
   }
  ],
  "grid_page_length": 50,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-04 18:03:13.621655",
+ "modified": "2025-11-05 19:43:56.917962",
  "modified_by": "Administrator",
  "module": "boss",
  "name": "Booking",

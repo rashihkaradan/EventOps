@@ -25,12 +25,4 @@ frappe.ui.form.on('Booking', {
   }
 });
 
-/*frappe.ui.form.on('Booking', {
-  price: function(frm) {
-      frm.set_value('total_amount', (frm.doc.price || 0) * (frm.doc.quantity || 0));
-  },
-  quantity: function(frm) {
-      frm.set_value('total_amount', (frm.doc.price || 0) * (frm.doc.quantity || 0));
-  }
-});
-*/
+
